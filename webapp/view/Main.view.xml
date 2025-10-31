@@ -1,0 +1,88 @@
+<mvc:View 
+    controllerName="com.logaligroup.employees.controller.Main"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns:fb="sap.ui.comp.filterbar">
+   <f:DynamicPage >
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="{i18n>appTitle}" />
+                </f:heading>
+            </f:DynamicPageTitle>
+        </f:title>
+        <f:header>
+            <f:DynamicPageHeader >
+                <fb:FilterBar 
+                      search="onFilterSearchPress"
+                      showClearOnFB="true"
+                      clear="onClearPress">
+                		<fb:filterGroupItems>
+								<fb:FilterGroupItem name="employee" 
+                                                    label="{i18n>labelEmployee}" 
+                                                    groupName="filters" 
+                                                    visibleInFilterBar="true">
+									<fb:control>
+										<Input/>
+									</fb:control>
+								</fb:FilterGroupItem>
+
+                                <fb:FilterGroupItem name="country" 
+                                                    label="{i18n>labelCountry}" 
+                                                    groupName="filters" 
+                                                    visibleInFilterBar="true">
+									<fb:control>
+										<!--<ComboBox items="{countries>/Countries}">
+                                            <items>
+                                                <core:Item key="{countries>code}" text="{countries>country}"/>
+                                            </items>
+                                        </ComboBox>-->
+                                        <MultiComboBox 
+                                            id="multiCombo"
+                                            items="{countries>/Countries}"
+                                            
+                                            >
+                                             <items>
+                                                <core:Item key="{countries>code}" text="{countries>country}"/>
+                                            </items>
+                                        </MultiComboBox>
+                                              
+									</fb:control>
+								</fb:FilterGroupItem>
+
+
+                        </fb:filterGroupItems>
+                           
+                            
+                       
+                </fb:FilterBar>
+            </f:DynamicPageHeader>
+        </f:header>
+        <f:content>
+            <Table id="table"
+                items="{employees>/Employees}" 
+                growing="true"
+                growingThreshold="10"
+                headerText="{i18n>title}">
+                <columns>
+                    <Column ><Label text="{i18n>ID}"/></Column>
+                     <Column ><Label text="{i18n>country}"/></Column>
+                     <Column ><Label text="{i18n>city}"/></Column>
+                     <Column ><Label text="{i18n>postalCode}"/></Column> 
+                </columns>
+                <items>
+                    <ColumnListItem >
+                        <cells>
+                            <ObjectIdentifier title="{employees>EmployeeID}" text="{employees>LastName}, {employees>FirstName}"/>
+                            <Text text="{employees>Country}"/>
+                            <Text text="{employees>City}"/>
+                            <Text text="{employees>PostalCode}"/>
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </f:content>
+   </f:DynamicPage>
+</mvc:View>
