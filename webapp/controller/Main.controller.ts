@@ -26,7 +26,8 @@ export default class Main extends BaseController {
     public onUpdateFinished (oEvent:Event): void {
         const oTable = oEvent.getSource()  as Table;
         const iTotal = (oEvent.getParameter("total") as number) ?? 0 ;
-        let sTitle = oTable.getHeaderText();
+        const oTitle = this.byId("titletable") as Title;
+        let sTitle = oTitle.getText();
         if (iTotal !== undefined && iTotal > 0){
             sTitle += "[";
             sTitle += `${iTotal}`;
@@ -34,7 +35,7 @@ export default class Main extends BaseController {
         }else {
             sTitle += "";
         }
-        oTable.setHeaderText(sTitle);
+        oTitle.setText(sTitle);
 
     }
 
@@ -83,6 +84,7 @@ export default class Main extends BaseController {
         const aControls = event.getParameter("selectionSet") as Control[];
         const oInput = aControls.find(c => c instanceof Input) as Input;
         const oMultiCombo = aControls.find(c => c instanceof MultiComboBox) as MultiComboBox;
+        
         // Limpiar valores de los filtros
         if (oInput) {
             oInput.setValue("");

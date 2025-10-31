@@ -66,6 +66,18 @@
                 growing="true"
                 growingThreshold="10"
                 headerText="{i18n>title}">
+
+                <headerToolbar id="headertoolbar">
+                    <Toolbar>
+                        <Title id="titletable" text="{i18n>title}" />
+                        <ToolbarSpacer />
+                        <Button 
+                            icon="sap-icon://excel-attachment" 
+                            tooltip="{i18n>exportToExcel}" 
+                            press=".onExportExcel" />
+                    </Toolbar>
+                </headerToolbar>
+
                 <columns>
                     <Column ><Label text="{i18n>ID}"/></Column>
                      <Column ><Label text="{i18n>country}"/></Column>
