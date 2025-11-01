@@ -15,30 +15,41 @@ import ReimportsourceModel from "sap/ui/model/resource/ResourceModel";
 import * as XLSX from "xlsx";//importar libreria xlsx
 import ResourceModel from "sap/ui/model/resource/ResourceModel";
 import { ODataListBinding$ChangeEvent } from "sap/ui/model/odata/v4/ODataListBinding";
+import Title from "sap/m/Title";
 
 /**
  * @namespace com.logaligroup.employees.controller
  */
 export default class Main extends BaseController {
+    
+    private _sBaseTitle: string = "";
+    private _iTotalRecords: number = 0;
 
     /*eslint-disable @typescript-eslint/no-empty-function*/
     public onInit(): void {
         const oTable = this.byId("table") as Table;
         oTable.attachUpdateFinished(this.onUpdateFinished, this);
-
+        //Guardar el título base
+        const oTitle = this.byId("titletable") as Title;
+        if (oTitle) {
+           
+            let resourceModel=(this.getOwnerComponent() as UIComponent).getModel("i18n") as ResourceModel;
+            let sTitle= (resourceModel.getResourceBundle() as ResourceBundle).getText("title") as string;
+            this._sBaseTitle = sTitle;
+        }
     }
     public onUpdateFinished (oEvent:Event): void {
         const oTable = oEvent.getSource()  as Table;
-        const iTotal = (oEvent.getParameter("total") as number) ?? 0 ;
+        const iFilteredCount = (oEvent.getParameter("total") as number) ?? 0;
         const oTitle = this.byId("titletable") as Title;
-        let sTitle = oTitle.getText();
-        if (iTotal !== undefined && iTotal > 0){
-            sTitle += "[";
-            sTitle += `${iTotal}`;
-            sTitle += "]";
-        }else {
-            sTitle += "";
+
+        // Si es la primera vez, guardamos el total global
+        if (this._iTotalRecords === 0 && iFilteredCount > 0) {
+            this._iTotalRecords = iFilteredCount;
         }
+        const iTotal = this._iTotalRecords || iFilteredCount;
+        const sTitle = `${this._sBaseTitle} [${iFilteredCount}/${iTotal}]`;
+
         oTitle.setText(sTitle);
 
     }
@@ -99,10 +110,11 @@ export default class Main extends BaseController {
             // oMultiCombo.setSelectedKeys([]);
         } 
         this.onFilterSearchPress(event);
-        const oTable = this.byId("table") as Table;
-        let resourceModel=(this.getOwnerComponent() as UIComponent).getModel("i18n") as ResourceModel;
-        let sTitle= (resourceModel.getResourceBundle() as ResourceBundle).getText("title") as string;
-        oTable.setHeaderText(sTitle);
+        //Forzar actualización del título
+        const iTotal = this._iTotalRecords;
+        const oTitle = this.byId("titletable") as Title;
+        const sTitle = `${this._sBaseTitle} [${iTotal}/${iTotal}]`;
+        oTitle.setText(sTitle);
     }
     private async loadXLSXLibrary(): Promise<void> {
     return new Promise((resolve, reject) => {
