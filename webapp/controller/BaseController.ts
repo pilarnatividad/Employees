@@ -47,4 +47,6 @@ export default class BaseController extends Controller {
     public getEventBus () : EventBus {
         return this.getEventBus() as EventBus;
     }
+
+     
 }

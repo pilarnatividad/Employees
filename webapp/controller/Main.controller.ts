@@ -11,7 +11,11 @@ import ListBinding from "sap/ui/model/ListBinding";
 import Event from "sap/ui/base/Event";
 import ResourceBundle from "sap/base/i18n/ResourceBundle";
 import UIComponent from "sap/ui/core/UIComponent";
+import ReimportsourceModel from "sap/ui/model/resource/ResourceModel";
+import * as XLSX from "xlsx";//importar libreria xlsx
 import ResourceModel from "sap/ui/model/resource/ResourceModel";
+import { ODataListBinding$ChangeEvent } from "sap/ui/model/odata/v4/ODataListBinding";
+
 /**
  * @namespace com.logaligroup.employees.controller
  */
@@ -84,7 +88,7 @@ export default class Main extends BaseController {
         const aControls = event.getParameter("selectionSet") as Control[];
         const oInput = aControls.find(c => c instanceof Input) as Input;
         const oMultiCombo = aControls.find(c => c instanceof MultiComboBox) as MultiComboBox;
-        
+
         // Limpiar valores de los filtros
         if (oInput) {
             oInput.setValue("");
@@ -100,4 +104,52 @@ export default class Main extends BaseController {
         let sTitle= (resourceModel.getResourceBundle() as ResourceBundle).getText("title") as string;
         oTable.setHeaderText(sTitle);
     }
+    private async loadXLSXLibrary(): Promise<void> {
+    return new Promise((resolve, reject) => {
+        // Si ya está cargada, no hace falta cargarla otra vez
+        if ((window as any).XLSX) {
+            resolve();
+            return;
+        }
+
+        const sUrl = sap.ui.require.toUrl("com/logaligroup/employees/lib/xlsx.full.min.js");
+        const script = document.createElement("script");
+        script.src = sUrl;
+        script.type = "text/javascript";
+        script.onload = () => resolve();
+        script.onerror = (e) => reject(e);
+        document.head.appendChild(script);
+    });
+}
+     public async  onExportToExcel(): Promise<void> {
+             //0.Cargar la librería sólo si no está cargada aún
+            await this.loadXLSXLibrary();
+            const XLSX = (window as any).XLSX;
+
+             // 1. Obtener la referencia a la tabla
+             const oTable = this.byId("table") as Table;
+
+             // 2. Obtener los objetos de datos puros de los contextos
+             // 2. Obtener el binding de los items
+             // Esto es crucial porque nos da los datos YA FILTRADOS por el FilterBar 
+             const aTableData= oTable.getItems().map(item => {
+                const ctx = item.getBindingContext("employees");
+                return ctx ? ctx.getObject() : {};
+             });
+             
+
+             // 3. Crear la Hoja de Cálculo (WorkSheet)
+            // Usamos 'json_to_sheet' que toma un array de objetos
+            const ws  = XLSX.utils.json_to_sheet(aTableData);
+
+             // 6. Crear el Libro de Trabajo (WorkBook)
+             const wb = XLSX.utils.book_new();
+
+             // 7. Añadir la hoja al libro con un nombre (ej: "Empleados")
+             XLSX.utils.book_append_sheet(wb, ws, "Empleados");
+
+             
+            // 8. Generar y descargar el archivo
+             XLSX.writeFile(wb, "ListaEmpleados.xlsx");
+     }
 }
