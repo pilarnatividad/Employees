@@ -19,6 +19,12 @@
       "target": "$1",
       "service": "html5-apps-repo-rt",
       "authenticationType": "xsuaa"
+    },
+    {
+      "source": "^/flags/(.*)$",
+      "target": "https://flagcdn.com/$1",
+      "authenticationType": "none",
+      "csrfProtection": false
     }
   ]
 }

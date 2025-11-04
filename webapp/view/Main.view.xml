@@ -39,16 +39,16 @@
                                                 <core:Item key="{countries>code}" text="{countries>country}"/>
                                             </items>
                                         </ComboBox>-->
-                                        <MultiComboBox 
-                                            id="multiCombo"
-                                            items="{countries>/Countries}"
-                                            
-                                            >
-                                             <items>
-                                                <core:Item key="{countries>code}" text="{countries>country}"/>
+                                       <!--<MultiComboBox id="multiCombo" 
+                                             items="{countries>/Countries}" > 
+                                            <items> 
+                                               <core:Item key="{countries>code}" text="{countries>code} {countries>country}"/>                                               
                                             </items>
-                                        </MultiComboBox>
-                                              
+                                        </MultiComboBox>-->
+                                       <MultiInput id="idMultiInput" suggestionItems ="{countries>/Countries}" valueHelpRequest="handleValueHelp">
+                                            <core:Item key="{countries>code}" text="{countries>country}" />
+                                        </MultiInput>
+                                                                                    
 									</fb:control>
 								</fb:FilterGroupItem>
 

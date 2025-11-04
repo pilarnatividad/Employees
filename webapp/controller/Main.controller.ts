@@ -12,21 +12,27 @@ import Event from "sap/ui/base/Event";
 import ResourceBundle from "sap/base/i18n/ResourceBundle";
 import UIComponent from "sap/ui/core/UIComponent";
 import ReimportsourceModel from "sap/ui/model/resource/ResourceModel";
-import * as XLSX from "xlsx";//importar libreria xlsx
 import ResourceModel from "sap/ui/model/resource/ResourceModel";
 import { ODataListBinding$ChangeEvent } from "sap/ui/model/odata/v4/ODataListBinding";
 import Title from "sap/m/Title";
+import JSONModel from "sap/ui/model/json/JSONModel";
+import SelectDialog, { SelectDialog$SearchEvent } from "sap/m/SelectDialog";
+import Dialog from "sap/m/Dialog";
+import Fragment from "sap/ui/core/Fragment";
+import MultiInput from "sap/m/MultiInput";
+import Token from "sap/m/Token";
 
 /**
  * @namespace com.logaligroup.employees.controller
  */
 export default class Main extends BaseController {
-    
+    private _countriesDialog?: Promise<SelectDialog>;
     private _sBaseTitle: string = "";
     private _iTotalRecords: number = 0;
-
+    
     /*eslint-disable @typescript-eslint/no-empty-function*/
     public onInit(): void {
+        
         const oTable = this.byId("table") as Table;
         oTable.attachUpdateFinished(this.onUpdateFinished, this);
         //Guardar el título base
@@ -37,8 +43,15 @@ export default class Main extends BaseController {
             let sTitle= (resourceModel.getResourceBundle() as ResourceBundle).getText("title") as string;
             this._sBaseTitle = sTitle;
         }
+
+        
+        
+            
+           
+        
     }
-    public onUpdateFinished (oEvent:Event): void {
+    
+    private onUpdateFinished (oEvent:Event): void {
         const oTable = oEvent.getSource()  as Table;
         const iFilteredCount = (oEvent.getParameter("total") as number) ?? 0;
         const oTitle = this.byId("titletable") as Title;
@@ -57,10 +70,11 @@ export default class Main extends BaseController {
     public onFilterSearchPress (event: FilterBar$SearchEvent): void {
         const aControls = event.getParameter("selectionSet") as Control[];
         const oInput = aControls.find(c => c instanceof Input) as Input;
-        const oMultiCombo = aControls.find(c => c instanceof MultiComboBox) as MultiComboBox;
-
+        //const oMultiCombo = aControls.find(c => c instanceof MultiComboBox) as MultiComboBox;
+        const oMultiInput = aControls.find(c => c instanceof MultiInput) as MultiInput;
         const sEmployee = oInput?.getValue() ?? "";
-        const aSelectedCountries = oMultiCombo?.getSelectedKeys() ?? [];
+        //const aSelectedCountries = oMultiCombo?.getSelectedKeys() ?? [];
+        const aSelectedCountries = oMultiInput?.getSelectedKey ?? [];
         const filters: Filter[] = [];
        
         if (sEmployee) {
@@ -98,17 +112,23 @@ export default class Main extends BaseController {
     public onClearPress(event: FilterBar$ClearEvent) : void{
         const aControls = event.getParameter("selectionSet") as Control[];
         const oInput = aControls.find(c => c instanceof Input) as Input;
-        const oMultiCombo = aControls.find(c => c instanceof MultiComboBox) as MultiComboBox;
-
+        //const oMultiCombo = aControls.find(c => c instanceof MultiComboBox) as MultiComboBox;
+        const oMultiInput = aControls.find(c => c instanceof MultiInput) as MultiInput;
         // Limpiar valores de los filtros
         if (oInput) {
             oInput.setValue("");
         }
-        if (oMultiCombo) {
-            oMultiCombo.removeAllSelectedItems(); // Limpia todas las selecciones
+        //if (oMultiCombo) {
+        //    oMultiCombo.removeAllSelectedItems(); // Limpia todas las selecciones
+        //    // o alternativamente:
+        //    // oMultiCombo.setSelectedKeys([]);
+        //} 
+        if (oMultiInput) {
+            oMultiInput.removeAllSuggestionItems(); // Limpia todas las selecciones
             // o alternativamente:
             // oMultiCombo.setSelectedKeys([]);
         } 
+
         this.onFilterSearchPress(event);
         //Forzar actualización del título
         const iTotal = this._iTotalRecords;
@@ -116,23 +136,32 @@ export default class Main extends BaseController {
         const sTitle = `${this._sBaseTitle} [${iTotal}/${iTotal}]`;
         oTitle.setText(sTitle);
     }
+    //función que carga dinámicamente la librería xlsx
+    //sólo si no está ya disponible
     private async loadXLSXLibrary(): Promise<void> {
-    return new Promise((resolve, reject) => {
-        // Si ya está cargada, no hace falta cargarla otra vez
-        if ((window as any).XLSX) {
-            resolve();
-            return;
-        }
 
-        const sUrl = sap.ui.require.toUrl("com/logaligroup/employees/lib/xlsx.full.min.js");
-        const script = document.createElement("script");
-        script.src = sUrl;
-        script.type = "text/javascript";
-        script.onload = () => resolve();
-        script.onerror = (e) => reject(e);
-        document.head.appendChild(script);
-    });
+        return new Promise((resolve, reject) => {
+            // Si ya está cargada, no hace falta cargarla otra vez
+            if ((window as any).XLSX) {
+                resolve();
+                return;
+            }
+            //resuelve la url real del recurso dentro de la aplicación sapui5
+            //toUrl convierte el nómbre del módulo a una url válida
+            const sUrl = sap.ui.require.toUrl("com/logaligroup/employees/lib/xlsx.full.min.js");
+            //Luego crea la etiqueta <script> y la inyecta en el documento
+            const script = document.createElement("script");
+            script.src = sUrl;
+            script.type = "text/javascript";
+            //Cuando carga correctamente hace resolve() de la promise y deja XLSX disponible en window.
+            script.onload = () => resolve();
+            //Si falla la descarga, hace reject(e) con el error
+            script.onerror = (e) => reject(e);
+            document.head.appendChild(script);
+        });
 }
+    //función para transformar lo que tenemos en una tabla, tal y como se ve, 
+    // con filtros aplicados, a un fichero Excel y descargarlo
      public async  onExportToExcel(): Promise<void> {
              //0.Cargar la librería sólo si no está cargada aún
             await this.loadXLSXLibrary();
@@ -144,11 +173,15 @@ export default class Main extends BaseController {
              // 2. Obtener los objetos de datos puros de los contextos
              // 2. Obtener el binding de los items
              // Esto es crucial porque nos da los datos YA FILTRADOS por el FilterBar 
+             //getItems devuelve las filas(items) instanciadas en la tabla
              const aTableData= oTable.getItems().map(item => {
+                //da el contexto del modelo a cada fila
                 const ctx = item.getBindingContext("employees");
+                //devuelve el objeto javascript puro que alimenta esa fila
                 return ctx ? ctx.getObject() : {};
              });
-             
+             //el resultado es aTableData que es un array de objetos con los datos
+             //ya filtrados 
 
              // 3. Crear la Hoja de Cálculo (WorkSheet)
             // Usamos 'json_to_sheet' que toma un array de objetos
@@ -161,7 +194,63 @@ export default class Main extends BaseController {
              XLSX.utils.book_append_sheet(wb, ws, "Empleados");
 
              
-            // 8. Generar y descargar el archivo
+            // 8. Generar el archivo y lanza la descarga del archivo en el navegador del usuario
              XLSX.writeFile(wb, "ListaEmpleados.xlsx");
      }
+     public formatCountryItemText(country: string, code: string): string {
+        return `${country} (${code})`;
+    }
+
+    
+    public handleValueHelp(oEvent: Event): void {
+        const sInputValue: string =
+            (oEvent.getSource() as any)?.getValue?.() ?? ""; // MultiInput.getValue()
+
+        const oView = this.getView();
+
+        if (!this._countriesDialog) {
+        this._countriesDialog = (Fragment.load({
+            id: oView.getId(),
+            name: "com.logaligroup.employees.view.Countries",
+            controller: this
+        }) as Promise<SelectDialog>).then((oValueHelpDialog) => {
+            oView.addDependent(oValueHelpDialog);
+            return oValueHelpDialog;
+        });
+        }
+
+        this._countriesDialog.then((oValueHelpDialog) => {
+        // filtra los items del diálogo por el valor actual del input
+        (oValueHelpDialog.getBinding("items") as ListBinding | null)?.filter([
+            new Filter("country", FilterOperator.Contains, sInputValue)
+        ]);
+        oValueHelpDialog.open(sInputValue);
+        });
+  }
+
+  /** Búsqueda dentro del SelectDialog */
+    public _handleValueHelpSearch(oEvent: Event): void {
+        const sValue: string = (oEvent.getParameter("value") as string) || "";
+        const oDlg = oEvent.getSource() as SelectDialog;
+        (oDlg.getBinding("items") as ListBinding | null)?.filter([
+        new Filter("Country", FilterOperator.Contains, sValue)
+        ]);
+    }
+
+    /** Cierre del diálogo: añade tokens al MultiInput */
+    public _handleValueHelpClose(oEvent: Event): void {
+        const aSelectedItems = (oEvent.getParameter("selectedItems") as any[]) || [];
+        const oMultiInput = this.byId("idMultiInput") as MultiInput;
+
+        if (aSelectedItems.length > 0) {
+        aSelectedItems.forEach((oItem: any) => {
+            oMultiInput.addToken(
+            new Token({
+                text: oItem.getTitle() // StandardListItem.getTitle()
+            })
+            );
+        });
+        }
+    }
+
 }
