@@ -16,11 +16,53 @@
                 </uxap:snappedHeading>
 
                 <uxap:expandedContent>
-                     <Text text="{employees>Country}"/>
+                     <HBox alignItems="Center"
+                           justifyContent="SpaceBetween">
+                         <HBox >
+                            <VBox>
+                                <Label text="{i18n>country}:" class="boldElement"/>
+                                <Text text="{employees>Country}"/>
+                            </VBox>
+                         </HBox> 
+                         <HBox>
+                            <VBox>
+                                <Label text="{i18n>city}:" class="boldElement"/>
+                                <Text text="{employees>City}"/>
+                            </VBox>
+                         </HBox> 
+                         <HBox>
+                            <VBox>
+                                <Label text="{i18n>postalCode}:" class="boldElement"/>
+                                <Text text="{employees>PostalCode}"/>
+                            </VBox>
+                         </HBox> 
+                     </HBox>
+
                 </uxap:expandedContent>
 
                 <uxap:snappedContent>
-                    <Text text="{employees>Country}"/>
+                     <HBox alignItems="Center"
+                           justifyContent="SpaceBetween">
+                         <HBox >
+                            <VBox>
+                                <Label text="{i18n>country}:" class="boldElement"/>
+                                <Text text="{employees>Country}"/>
+                            </VBox>
+                         </HBox> 
+                         <HBox>
+                            <VBox>
+                                <Label text="{i18n>city}:" class="boldElement"/>
+                                <Text text="{employees>City}"/>
+                            </VBox>
+                         </HBox> 
+                         <HBox>
+                            <VBox>
+                                <Label text="{i18n>postalCode}:" class="boldElement"/>
+                                <Text text="{employees>PostalCode}"/>
+                            </VBox>
+                         </HBox> 
+                     </HBox>
+
                 </uxap:snappedContent>
 
                 <uxap:actions>
