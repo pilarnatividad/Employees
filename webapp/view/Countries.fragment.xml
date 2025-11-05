@@ -1,7 +1,7 @@
 <core:FragmentDefinition
 	xmlns="sap.m"
 	xmlns:core="sap.ui.core"
-     controllerName="com.logaligroup.employees.controller.Master"
+     
 >
 <SelectDialog id="valueHelpDialog" 
               title="{i18n>labelCountry}" 
@@ -11,7 +11,7 @@
               cancel="_handleValueHelpClose" 
               multiSelect="true">
      <StandardListItem icon="{countries>flag}" iconDensityAware="false" iconInset="false" title="{countries>code}" description="{countries>country}"
-                    key="{countries>code}"/>
+                    />
           
 </SelectDialog>
 </core:FragmentDefinition>

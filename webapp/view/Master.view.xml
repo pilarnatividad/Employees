@@ -79,13 +79,15 @@
                 </headerToolbar>
 
                 <columns>
-                    <Column ><Label text="{i18n>ID}"/></Column>
-                     <Column ><Label text="{i18n>country}"/></Column>
-                     <Column ><Label text="{i18n>city}"/></Column>
-                     <Column ><Label text="{i18n>postalCode}"/></Column> 
+                    <Column minScreenWidth="Small" demandPopin="true" ><Label text="{i18n>ID}"/></Column>
+                    <Column minScreenWidth="Small" demandPopin="true"><Label text="{i18n>country}"/></Column>
+                    <Column minScreenWidth="Small" demandPopin="true"><Label text="{i18n>city}"/></Column>
+                    <Column minScreenWidth="Small" demandPopin="false" ><Label text="{i18n>postalCode}"/></Column> 
                 </columns>
                 <items>
-                    <ColumnListItem >
+                    <ColumnListItem 
+                           type="Navigation"
+                           press="onNavToDetails">
                         <cells>
                             <ObjectIdentifier title="{employees>EmployeeID}" text="{employees>LastName}, {employees>FirstName}"/>
                             <Text text="{employees>Country}"/>

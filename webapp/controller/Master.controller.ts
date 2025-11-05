@@ -21,6 +21,8 @@ import Dialog from "sap/m/Dialog";
 import Fragment from "sap/ui/core/Fragment";
 import MultiInput from "sap/m/MultiInput";
 import Token from "sap/m/Token";
+import ObjectListItem from "sap/m/ObjectListItem";
+import Context from "sap/ui/model/Context";
 
 /**
  * @namespace com.logaligroup.employees.controller
@@ -261,6 +263,28 @@ export default class Master extends BaseController {
             }    
         });
         
+    }
+
+    public onNavToDetails(event : Event): void {
+        let item = event.getSource() as ObjectListItem;
+        let bindingContext = item.getBindingContext("employees") as Context;
+        //obtenemos el id del empleado
+        let id = bindingContext.getProperty("EmployeeID");
+        const model = this.getModel("view") as JSONModel;
+        model.setProperty("/layout", "TwoColumnsMidExpanded");
+        //como vamos a hacer una navegación necesitamos nuestro router
+        //Y con esta función getRouter que definimos en el controlador base , nos 
+        //retorna el router que lo toma de Components.ts
+        const router = this.getRouter();
+        // con el router navegamos a RouteDetail, y debemos pasarle el ID del empleado
+        //porque cuendo definimos el RouteDetail en la propiedad patern le incluimos el ID 
+        //para que se filtren los datos del empleado.
+        console.log(id)
+        router.navTo("RouteDetails",{
+            //como el id que me devuelve es EmployeeID  y es 1 en el primer registro, y
+            // tengo que pasarle 0, pues convierto el id a entero y luego le resto 1. 
+            ID: parseInt(id) -1 
+        } );
     }
 
 }

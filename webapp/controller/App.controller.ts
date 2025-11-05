@@ -33,6 +33,6 @@ export default class App extends BaseController {
         //el objeto data se va a convertir en un modelo.
         const model = new JSONModel(data);
         //le llamamos countries
-        this.setModel(model, "countries");
+        this.setModel(model, "view");
     }
 }

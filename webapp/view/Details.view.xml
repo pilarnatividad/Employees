@@ -1,0 +1,38 @@
+<mvc:View
+	controllerName="com.logaligroup.employees.controller.Details"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+    xmlns:uxap="sap.uxap"
+>
+    <uxap:ObjectPageLayout >
+        <uxap:headerTitle>
+           <uxap:ObjectPageDynamicHeaderTitle>
+                <uxap:expandedHeading>
+                    <Title text="{employees>LastName} {employees>FirstName} ({employees>EmployeeID})"/>
+                </uxap:expandedHeading>
+
+                <uxap:snappedHeading>
+                    <Title text="{employees>LastName} {employees>FirstName} ({employees>EmployeeID})"/>
+                </uxap:snappedHeading>
+
+                <uxap:expandedContent>
+                     <Text text="{employees>Country}"/>
+                </uxap:expandedContent>
+
+                <uxap:snappedContent>
+                    <Text text="{employees>Country}"/>
+                </uxap:snappedContent>
+
+                <uxap:actions>
+                    <Button icon="sap-icon://decline"
+                            press="onClosePress"
+                            type="Reject" />
+                </uxap:actions>
+           </uxap:ObjectPageDynamicHeaderTitle>
+        </uxap:headerTitle>
+
+        <uxap:sections>
+        
+        </uxap:sections>
+    </uxap:ObjectPageLayout>
+</mvc:View>

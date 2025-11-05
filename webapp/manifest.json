@@ -69,22 +69,40 @@
         "type": "View",
         "viewType": "XML",
         "path": "com.logaligroup.employees.view",
-        "async": true,
-        "viewPath": "com.logaligroup.employees.view"
+        "async": true
       },
       "routes": [
         {
-          "name": "RouteMain",
+          "name": "RouteMaster",
           "pattern": ":?query:",
           "target": [
-            "TargetMain"
+            "TargetMaster"
+          ]
+        },
+        {
+          "name": "RouteDetails",
+          "pattern": "Employee({ID})",
+          "target": [
+             "TargetMaster",
+             "TargetDetails"
           ]
         }
       ],
       "targets": {
-        "TargetMain": {
-          "id": "Master",
+        "TargetContainer":{
+          "name": "Container"
+        },
+        "TargetMaster": {
+          "parent": "TargetContainer",
+          "controlId": "container-fcl",
+          "controlAggregation": "beginColumnPages",
           "name": "Master"
+        },
+        "TargetDetails": {
+          "parent": "TargetContainer",
+          "controlId": "container-fcl",
+          "controlAggregation": "midColumnPages",
+          "name": "Details"
         }
       }
     },
