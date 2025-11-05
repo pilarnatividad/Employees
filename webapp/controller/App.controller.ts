@@ -10,6 +10,7 @@ export default class App extends BaseController {
     public onInit(): void {
         this.loadEmployees();
         this.loadCountries();
+        this.loadView();
 
     }
     private loadEmployees () : void {
@@ -22,6 +23,16 @@ export default class App extends BaseController {
         const model = new JSONModel();
         model.setSizeLimit(250);
         model.loadData("../model/Countries.json");
+        this.setModel(model, "countries");
+        }
+    //creamos un modelo para cargar layout
+    private loadView(): void {
+        const data = {
+            layout: "OneColumn"
+        };
+        //el objeto data se va a convertir en un modelo.
+        const model = new JSONModel(data);
+        //le llamamos countries
         this.setModel(model, "countries");
     }
 }

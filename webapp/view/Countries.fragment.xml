@@ -1,7 +1,7 @@
 <core:FragmentDefinition
 	xmlns="sap.m"
 	xmlns:core="sap.ui.core"
-     controllerName="com.logaligroup.employees.controller.Main"
+     controllerName="com.logaligroup.employees.controller.Master"
 >
 <SelectDialog id="valueHelpDialog" 
               title="{i18n>labelCountry}" 

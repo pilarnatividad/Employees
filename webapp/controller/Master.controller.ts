@@ -25,7 +25,7 @@ import Token from "sap/m/Token";
 /**
  * @namespace com.logaligroup.employees.controller
  */
-export default class Main extends BaseController {
+export default class Master extends BaseController {
     private _countriesDialog?: Promise<SelectDialog>;
     private _sBaseTitle: string = "";
     private _iTotalRecords: number = 0;

@@ -1,5 +1,5 @@
 <mvc:View 
-    controllerName="com.logaligroup.employees.controller.Main"
+    controllerName="com.logaligroup.employees.controller.Master"
     xmlns="sap.m"
     xmlns:f="sap.f"
     xmlns:mvc="sap.ui.core.mvc"

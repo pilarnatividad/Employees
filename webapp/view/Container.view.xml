@@ -1,0 +1,18 @@
+<mvc:View
+	controllerName="com.logaligroup.employees.controller.Container"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:c="sap.ui.core"
+    xmlns:f="sap.f"
+	displayBlock="true"
+	height="100%"
+	busyIndicatorDelay="0"
+>
+    <!--FlexibleColumnLayout tiene una propiedad layout en la que definimos hacemos referencia al
+    modelo view que creamos en el controlador -->
+    <f:FlexibleColumnLayout id="container-fcl"
+                            layout="{view>/layout}">
+
+    </f:FlexibleColumnLayout>
+
+</mvc:View>

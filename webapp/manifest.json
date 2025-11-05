@@ -83,8 +83,8 @@
       ],
       "targets": {
         "TargetMain": {
-          "id": "Main",
-          "name": "Main"
+          "id": "Master",
+          "name": "Master"
         }
       }
     },
