@@ -72,9 +72,12 @@ export default class Main extends BaseController {
         const oInput = aControls.find(c => c instanceof Input) as Input;
         //const oMultiCombo = aControls.find(c => c instanceof MultiComboBox) as MultiComboBox;
         const oMultiInput = aControls.find(c => c instanceof MultiInput) as MultiInput;
-        const sEmployee = oInput?.getValue() ?? "";
+
+        const sEmployee = oInput?.getValue()?.trim() ?? "";
+        
         //const aSelectedCountries = oMultiCombo?.getSelectedKeys() ?? [];
-        const aSelectedCountries = oMultiInput?.getSelectedKey ?? [];
+        const aSelectedCountries =  (oMultiInput?.getTokens() || []).map(t => t.getText()).filter(Boolean);
+
         const filters: Filter[] = [];
        
         if (sEmployee) {
@@ -97,7 +100,7 @@ export default class Main extends BaseController {
         // Filtro por países seleccionados en el MultiComboBox
         if (aSelectedCountries.length > 0) {
             const aCountryFilters = aSelectedCountries.map(
-                (country) => new Filter("Country", FilterOperator.EQ, country)
+                (code) => new Filter("Country", FilterOperator.EQ, code)
             );
             filters.push(new Filter({ filters: aCountryFilters, and: false }));
         }
@@ -124,7 +127,7 @@ export default class Main extends BaseController {
         //    // oMultiCombo.setSelectedKeys([]);
         //} 
         if (oMultiInput) {
-            oMultiInput.removeAllSuggestionItems(); // Limpia todas las selecciones
+            oMultiInput.removeAllTokens(); // Limpia todas las selecciones
             // o alternativamente:
             // oMultiCombo.setSelectedKeys([]);
         } 
@@ -232,8 +235,15 @@ export default class Main extends BaseController {
     public _handleValueHelpSearch(oEvent: Event): void {
         const sValue: string = (oEvent.getParameter("value") as string) || "";
         const oDlg = oEvent.getSource() as SelectDialog;
+
         (oDlg.getBinding("items") as ListBinding | null)?.filter([
-        new Filter("Country", FilterOperator.Contains, sValue)
+        new Filter({
+            filters: [
+                new Filter("country", FilterOperator.Contains, sValue),
+                new Filter("code", FilterOperator.Contains, sValue)
+            ],
+            and: false
+        })
         ]);
     }
 
@@ -241,16 +251,16 @@ export default class Main extends BaseController {
     public _handleValueHelpClose(oEvent: Event): void {
         const aSelectedItems = (oEvent.getParameter("selectedItems") as any[]) || [];
         const oMultiInput = this.byId("idMultiInput") as MultiInput;
-
-        if (aSelectedItems.length > 0) {
+        if (!oMultiInput || aSelectedItems.length === 0) return;
+        const existing = new Set(oMultiInput.getTokens().map(t => t.getText()));
+        
         aSelectedItems.forEach((oItem: any) => {
-            oMultiInput.addToken(
-            new Token({
-                text: oItem.getTitle() // StandardListItem.getTitle()
-            })
-            );
+            const code = oItem.getTitle();
+            if (!existing.has(code)) {
+                oMultiInput.addToken(new Token({ text: code}))
+            }    
         });
-        }
+        
     }
 
 }
